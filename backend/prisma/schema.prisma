@@ -1,0 +1,299 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String  @id @default(uuid())
+  username      String  @unique
+  password_hash String
+  full_name     String
+  nrp           String?
+  department    String?
+  email         String?
+  role          String  @default("USER")
+  contact       String?
+
+  workOrders WorkOrder[] @relation("Requester")
+  approvals  Approval[]  @relation("Approver")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Area {
+  id         Int         @id @default(autoincrement())
+  name       String
+  bangunans  Bangunan[]
+  workOrders WorkOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model JenisBangunan {
+  id        Int        @id @default(autoincrement())
+  name      String
+  bangunans Bangunan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Kepemilikan {
+  id        Int        @id @default(autoincrement())
+  name      String
+  bangunans Bangunan[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Bangunan {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  area_id Int
+  area    Area @relation(fields: [area_id], references: [id])
+
+  jenis_id Int
+  jenis    JenisBangunan @relation(fields: [jenis_id], references: [id])
+
+  kepemilikan_id Int
+  kepemilikan    Kepemilikan @relation(fields: [kepemilikan_id], references: [id])
+
+  workOrders WorkOrder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkOrder {
+  id          String  @id @default(uuid())
+  no_wo       String? @unique
+  title       String
+  description String
+
+  requester_id String
+  requester    User   @relation("Requester", fields: [requester_id], references: [id])
+
+  area_id Int
+  area    Area @relation(fields: [area_id], references: [id])
+
+  bangunans Bangunan[]
+
+  lampiran_urls String @default("[]") @db.NVarChar(Max)
+
+  status String @default("PENDING")
+
+  approvals Approval[]
+  progress  WoProgress?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Approval {
+  id String @id @default(uuid())
+
+  wo_id     String
+  workOrder WorkOrder @relation(fields: [wo_id], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  approver_id String
+  approver    User   @relation("Approver", fields: [approver_id], references: [id], onUpdate: NoAction, onDelete: NoAction)
+
+  approval_type String
+  status        String
+  reject_reason String?
+  signature_url String?
+
+  approvedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model WoProgress {
+  id String @id @default(uuid())
+
+  wo_id     String    @unique
+  workOrder WorkOrder @relation(fields: [wo_id], references: [id])
+
+  status             String
+  lampiran_hasil_url String?
+  is_acknowledged    Boolean @default(false)
+
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ==========================================
+// NEW MODELS FOR COAL TRANSPORT / SARANA
+// ==========================================
+
+model Sarana {
+  id                         String  @id @default(uuid())
+  no_lambung                 String? @unique
+  departemen                 String?
+  section                    String?
+  rute                       String?
+  user_tujuan                String?
+  by_job                     String?
+  by_type                    String?
+  kode_sap                   String?
+  lokasi                     String?
+  area                       String?
+  no_polisi                  String?
+  no_rangka                  String?
+  nama_pemilik               String?
+  merk                       String?
+  jenis_unit                 String?
+  tipe_unit                  String?
+  tahun_pembuatan            Int?
+  awal_kontrak               String?
+  akhir_kontrak              String?
+  harga                      String?
+  kalender_stiker            String?
+  supplier                   String?
+  legalitas                  String?
+  nomor_kontrak              String?
+  shift                      String?
+  gps                        String?
+  overtime                   String?
+  fuel_ratio_kontrak_lama    String?
+  fuel_ratio_kontrak_terbaru String?
+  status                     String? @default("Operasional")
+
+  fuel_quotas  FuelQuota[]
+  fuel_records FuelRecord[]
+  p2h_forms    P2HForm[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FuelQuota {
+  id String @id @default(uuid())
+
+  unit_id String
+  unit    Sarana @relation(fields: [unit_id], references: [id])
+
+  plan_jarak       Float?
+  ratio            Float?
+  permintaan_kuota Float?
+  plan_kuota_hari  Float?
+  kartu_kuota      Float?
+  no_id            String?
+  sap_code         String?
+  tempat_refueling String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FuelRecord {
+  id String @id @default(uuid())
+
+  unit_id String
+  unit    Sarana @relation(fields: [unit_id], references: [id])
+
+  tanggal      DateTime
+  jam          String?
+  petugas_name String?
+  petugas_nrp  String?
+  fuelman_name String?
+  fuelman_nrp  String?
+  jadwal_rute  Float?
+  jenis_bbm    String?
+  liter        Float?
+  km_awal      Float?
+  km_akhir     Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model P2HForm {
+  id            String   @id @default(uuid())
+  unit_id       String?
+  tanggal       DateTime
+  shift         String?
+  lokasi_parkir String?
+  area_kerja    String?
+
+  no_lambung  String?
+  jenis_unit  String?
+  nama_driver String?
+  nrp_driver  String?
+  km_awal     Float?
+  km_akhir    Float?
+  exp_stiker  DateTime?
+  supplier    String?
+  no_polisi   String?
+
+  matrix_checklist String? @db.NVarChar(Max)
+
+  jam_istirahat String?
+  bugar_sehat   String? @db.NVarChar(Max)
+
+  isi_p5m     String?
+  driver_siap String?
+
+  keputusan_akhir     String?
+  nama_pengawas       String?
+  nrp_pengawas        String?
+  keterangan_pengawas String?
+  status              String  @default("PENDING_REVIEW")
+  gambar_url          String?
+  latitude            Float?
+  longitude           Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unit Sarana? @relation(fields: [unit_id], references: [id])
+}
+
+model ReportBreakdown {
+  id            String   @id @default(uuid())
+  tanggal       DateTime @default(now())
+  shift         String
+  no_lambung    String
+  jenis_unit    String?
+  section       String?
+  supplier      String?
+  keterangan_bd String?
+  pengganti     String?
+  lama_bd       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model KuponTambahanBBM {
+  id                      String   @id @default(uuid())
+  tanggal                 DateTime @default(now())
+  jam                     String?
+  nama_driver             String?
+  nrp_driver              String?
+  no_lambung              String?
+  supplier                String?
+  no_polisi               String?
+  jumlah_fuel             String?
+  alasan                  String?  @db.NVarChar(Max)
+  status_approval_gact    String   @default("PENDING")
+  approver_gact           String?
+  status_approval_fuelman String   @default("PENDING")
+  approver_fuelman        String?
+
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
