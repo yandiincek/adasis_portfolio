@@ -18,9 +18,6 @@ dist-ssr
 .env.test.local
 .env.production.local
 
-# portfolio assets
-screenshots/
-README_portfolio.md
 
 # Editor directories and files
 .vscode/*
