@@ -2,7 +2,7 @@
 
 > **Disclamer:** Proyek ini adalah sistem Enterprise untuk manajemen internal (General Affair & Coal Transport). Data yang ditampilkan pada screenshot adalah data *dummy* / simulasi.
 
-![Adasis Banner](./screenshots/banner.png) <!-- GANTI DENGAN SCREENSHOT DASHBOARD UTAMA ANDA -->
+![Adasis Banner](./screenshots/banner.PNG) <!-- GANTI DENGAN SCREENSHOT DASHBOARD UTAMA ANDA -->
 
 Adasis adalah aplikasi berbasis web *Enterprise-Grade* yang dirancang khusus untuk mendigitalisasi operasional **General Affair & Transport (GACT)** pada perusahaan pertambangan. Sistem ini menggantikan proses manual berbasis kertas menjadi alur kerja digital yang modern, *real-time*, dan terotomatisasi penuh dengan integrasi Notifikasi WhatsApp.
 
@@ -39,9 +39,9 @@ Aplikasi ini dibangun menggunakan arsitektur *Decoupled* (Pemisahan Frontend dan
 
 | Dashboard Infrastruktur | Alur Persetujuan Work Order (WO) |
 |:---:|:---:|
-| ![Dashboard Infra](./screenshots/infra.png) | ![Approval Flow](./screenshots/approval.png) |
+| ![Dashboard Infra](./screenshots/infra.PNG) | ![Approval Flow](./screenshots/approval.PNG) |
 | **Pemeriksaan Harian (P2H) Sarana** | **WhatsApp Notification Gateway** |
-| ![P2H Form](./screenshots/p2h.png) | ![WA Notification](./screenshots/wa.png) |
+| ![P2H Form](./screenshots/p2h.PNG) | ![WA Notification](./screenshots/wa.PNG) |
 
 *(Catatan: Buat folder `screenshots` di dalam project Anda dan masukkan gambar aplikasi Anda ke dalam folder tersebut dengan nama yang sesuai)*
 
